@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>کالری‌شمار</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f6f4;--card:#fff;--ink:#17302b;--mut:#5d7570;--ac:#1f7a5c;--ac2:#d9822b;--line:#d8e3df;--bar:#8fc7b1;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10201c;--card:#182b26;--ink:#e6f1ed;--mut:#93aca5;--ac:#4cc29b;--ac2:#f0a24d;--line:#2b423b;--bar:#2f7a63}}
+:root[data-theme="dark"]{--bg:#10201c;--card:#182b26;--ink:#e6f1ed;--mut:#93aca5;--ac:#4cc29b;--ac2:#f0a24d;--line:#2b423b;--bar:#2f7a63}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.7;max-width:640px;margin-inline:auto;padding:14px}
+h1{font-size:22px;font-weight:800;margin:4px 0 12px}
+h2{font-size:15px;font-weight:600;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.total{display:flex;align-items:baseline;gap:8px}
+.total b{font-size:40px;font-weight:800;color:var(--ac)}
+.total span{color:var(--mut);font-size:14px}
+.prog{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:8px 0 4px}
+.prog i{display:block;height:100%;background:var(--ac)}
+.prog.over i{background:var(--ac2)}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:2px}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+button{border:0;border-radius:10px;padding:10px 14px;background:var(--ac);color:#fff;font-weight:600;cursor:pointer}
+button.alt{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+button.x{background:none;color:var(--mut);padding:2px 8px;font-size:18px}
+.full{width:100%}
+.meal{border-top:1px solid var(--line);padding:8px 0}
+.meal:first-of-type{border-top:0}
+.mh{display:flex;justify-content:space-between;font-weight:600}
+.it{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--mut)}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs button{flex:1;background:transparent;color:var(--ink);border:1px solid var(--line);padding:6px}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.chart{overflow-x:auto}
+.note{font-size:12px;color:var(--mut)}
+.top{display:flex;justify-content:space-between;align-items:center}
+.top input{width:auto}
+</style>
+</head>
+<body>
+<div class="top"><h1>کالری‌شمار</h1><input type="date" id="day" aria-label="روز"></div>
+
+<div class="card">
+  <div class="note" id="jd"></div>
+  <div class="total"><b id="tot">۰</b><span>کیلوکالری امروز</span></div>
+  <div class="prog" id="pg"><i id="pgi" style="width:0"></i></div>
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <span class="note" id="left"></span>
+    <span class="note">هدف روزانه: <input id="goal" type="text" inputmode="decimal" style="width:90px;padding:4px 6px"></span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>مشخصات من و برنامه کالری</h2>
+  <div class="row">
+    <div><label for="pg_sex">جنسیت</label><select id="pg_sex"><option value="f">زن</option><option value="m">مرد</option></select></div>
+    <div><label for="pg_age">سن (سال)</label><input id="pg_age" type="text" inputmode="decimal"></div>
+  </div>
+  <div class="row">
+    <div><label for="pg_w">وزن (کیلوگرم)</label><input id="pg_w" type="text" inputmode="decimal" step="any"></div>
+    <div><label for="pg_h">قد (سانتی‌متر)</label><input id="pg_h" type="text" inputmode="decimal" step="any"></div>
+  </div>
+  <div class="row">
+    <div><label for="pg_d">روز ورزش در هفته</label><input id="pg_d" type="text" inputmode="decimal" min="0" max="7" value="0"></div>
+    <div><label for="pg_m">دقیقه ورزش در هر روز</label><input id="pg_m" type="text" inputmode="decimal" min="0" value="0"></div>
+  </div>
+  <div class="row">
+    <div><label for="pg_i">شدت ورزش</label><select id="pg_i"><option value="3.5">سبک (پیاده‌روی آرام)</option><option value="5" selected>متوسط (پیاده‌روی تند، شنا)</option><option value="8">شدید (دویدن، هوازی سنگین)</option></select></div>
+    <div><label for="pg_g">هدف</label><select id="pg_g"><option value="-1">کاهش وزن</option><option value="0" selected>ثابت ماندن وزن</option><option value="1">افزایش وزن</option></select></div>
+  </div>
+  <button class="full" id="pg_go">محاسبه BMI و برنامه</button>
+  <div id="pg_out" style="margin-top:10px;font-size:14px"></div>
+</div>
+
+<div class="card">
+  <h2>ثبت غذا</h2>
+  <div class="row">
+    <div><label for="meal">وعده</label>
+      <select id="meal"><option>صبحانه</option><option>ناهار</option><option>شام</option><option>میان‌وعده</option></select></div>
+    <div><label for="name">نام غذا (جستجو در غذاهای ذخیره‌شده)</label>
+      <input id="name" list="fl" autocomplete="off" placeholder="مثلاً قورمه‌سبزی"><datalist id="fl"></datalist></div>
+  </div>
+  <div class="row">
+    <div><label for="unit">واحد</label>
+      <input id="unit" list="ul" placeholder="گرم / عدد / لیوان / بشقاب"><datalist id="ul"><option>گرم</option><option>عدد</option><option>لیوان</option><option>قاشق غذاخوری</option><option>کفگیر</option><option>بشقاب</option><option>تکه</option></datalist></div>
+    <div><label for="kc">کالری هر واحد</label>
+      <input id="kc" type="text" inputmode="decimal" placeholder="مثلاً ۵۲"></div>
+  </div>
+  <div class="row">
+    <div><label for="qty">مقدار</label><input id="qty" type="text" inputmode="decimal" value="1" step="any"></div>
+    <div><label>&nbsp;</label><button class="full" id="add">افزودن</button></div>
+  </div>
+  <div class="note" id="hint">برای گرم، «کالری هر ۱ گرم» را بنویسید (مثلاً ۱۰۰ کیلوکالری در ۱۰۰ گرم = ۱). کالری و واحد غذا ذخیره می‌شود و دفعه بعد خودکار پر می‌شود.</div>
+</div>
+
+<div class="card" id="meals"></div>
+
+<div class="card">
+  <h2>نمودار</h2>
+  <div class="tabs" id="tabs">
+    <button data-v="d">روزانه</button><button data-v="w">هفتگی</button><button data-v="m">ماهانه</button><button data-v="y">سالانه</button>
+  </div>
+  <div class="chart" id="chart"></div>
+  <div class="note" id="cn"></div>
+</div>
+
+<div class="card">
+  <h2>پشتیبان‌گیری</h2>
+  <div class="note" style="margin-bottom:8px">داده‌ها فقط روی همین مرورگر ذخیره می‌شوند. متن پشتیبان را جایی ذخیره کنید.</div>
+  <textarea id="bk" rows="3" placeholder="متن پشتیبان اینجا نمایش داده می‌شود یا برای بازگردانی اینجا بچسبانید"></textarea>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button class="alt" id="exp">ساخت پشتیبان</button><button class="alt" id="cp">کپی</button><button class="alt" id="imp">بازگردانی</button>
+  </div>
+</div>
+
+<script>
+const MEALS=["صبحانه","ناهار","شام","میان‌وعده"];
+const $=id=>document.getElementById(id);
+const num=s=>{s=String(s).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٫,،]/g,'.').trim();return parseFloat(s)};
+const f2=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:2});
+const fa=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:0});
+let S={foods:{},logs:[],goal:2000};
+function load(){try{const r=localStorage.getItem('kc1');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
+function save(){try{localStorage.setItem('kc1',JSON.stringify(S))}catch(e){}}
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const parse=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const jf=(d,o)=>new Intl.DateTimeFormat('fa-IR-u-ca-persian',o).format(d);
+const jparts=d=>{const p=new DateTimeFormatParts(d);return p};
+function DateTimeFormatParts(d){const o={};new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric',month:'numeric'}).formatToParts(d).forEach(p=>o[p.type]=p.value);return{y:parseInt(o.year),m:parseInt(o.month)}}
+let view='d';
+const kc=l=>l.qty*l.kcal;
+const dayLogs=d=>S.logs.filter(l=>l.date===d);
+const sum=a=>a.reduce((s,l)=>s+kc(l),0);
+
+function render(){
+  const d=$('day').value,L=dayLogs(d),t=sum(L),g=+S.goal||0;
+  $('jd').textContent=jf(parse(d),{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  $('tot').textContent=fa(t);
+  $('pgi').style.width=(g?Math.min(100,t/g*100):0)+'%';
+  $('pg').className='prog'+(g&&t>g?' over':'');
+  $('left').textContent=g?(t>g?fa(t-g)+' کیلوکالری بیشتر از هدف':fa(g-t)+' کیلوکالری تا هدف باقی مانده'):'';
+  $('goal').value=g||'';
+  $('fl').innerHTML=Object.keys(S.foods).map(n=>`<option value="${n.replace(/"/g,'&quot;')}">`).join('');
+  $('meals').innerHTML=MEALS.map(m=>{
+    const ml=L.filter(l=>l.meal===m);
+    return `<div class="meal"><div class="mh"><span>${m}</span><span>${fa(sum(ml))} کیلوکالری</span></div>`+
+    (ml.length?ml.map(l=>`<div class="it"><span>${esc(l.name)}: ${f2(l.qty)} ${esc(l.unit)} × ${f2(l.kcal)} = ${fa(kc(l))} کیلوکالری</span><span><button class="x" data-del="${l.id}" aria-label="حذف">×</button></span></div>`).join(''):`<div class="note">چیزی ثبت نشده</div>`)+`</div>`}).join('');
+  chart();
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function bars(items,goal){
+  const W=Math.max(300,items.length*34),H=190,pb=34,pt=14,max=Math.max(goal||0,...items.map(i=>i.v),1)*1.1,bw=Math.min(26,(W/items.length)*.7);
+  const y=v=>H-pb-(v/max)*(H-pb-pt);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img">`;
+  if(goal)s+=`<line x1="0" x2="${W}" y1="${y(goal)}" y2="${y(goal)}" stroke="var(--ac2)" stroke-dasharray="4 4"/>`;
+  items.forEach((it,i)=>{const x=(i+.5)*W/items.length;
+    s+=`<rect x="${x-bw/2}" y="${y(it.v)}" width="${bw}" height="${H-pb-y(it.v)}" rx="3" fill="${goal&&it.v>goal?'var(--ac2)':'var(--ac)'}"/>`;
+    if(it.v)s+=`<text x="${x}" y="${y(it.v)-3}" font-size="9" text-anchor="middle" fill="var(--mut)">${fa(it.v)}</text>`;
+    s+=`<text x="${x}" y="${H-pb+14}" font-size="10" text-anchor="middle" fill="var(--mut)">${it.l}</text>`;
+    if(it.l2)s+=`<text x="${x}" y="${H-pb+26}" font-size="9" text-anchor="middle" fill="var(--mut)">${it.l2}</text>`});
+  return s+'</svg>';
+}
+function chart(){
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
+  const d=parse($('day').value),g=+S.goal||0;let items=[],note='';
+  const byDate={};S.logs.forEach(l=>byDate[l.date]=(byDate[l.date]||0)+kc(l));
+  if(view==='d'){
+    const L=dayLogs(iso(d));items=MEALS.map(m=>({l:m,v:sum(L.filter(x=>x.meal===m))}));g&&0;
+    $('chart').innerHTML=bars(items,0);note='کالری هر وعده در روز انتخاب‌شده';
+  }else if(view==='w'||view==='m'){
+    const n=view==='w'?7:30;
+    for(let i=n-1;i>=0;i--){const x=new Date(d);x.setDate(x.getDate()-i);items.push({l:jf(x,{day:'numeric'}),l2:view==='w'?jf(x,{weekday:'narrow'}):'',v:byDate[iso(x)]||0})}
+    const days=items.filter(i=>i.v>0);
+    note=`${view==='w'?'۷':'۳۰'} روز تا روز انتخاب‌شده. میانگین روزهای ثبت‌شده: ${days.length?fa(days.reduce((s,i)=>s+i.v,0)/days.length):'۰'} — خط نارنجی هدف است`;
+    $('chart').innerHTML=bars(items,g);
+  }else{
+    const cur=jparts(d),mons={};
+    for(let i=0;i<12;i++){mons[i+1]={t:0,days:0}}
+    Object.keys(byDate).forEach(k=>{const p=jparts(parse(k));if(p.y===cur.y){mons[p.m].t+=byDate[k];mons[p.m].days++}});
+    const names=['فرو','ارد','خرد','تیر','مرد','شهر','مهر','آبا','آذر','دی','بهم','اسف'];
+    items=names.map((n,i)=>({l:n,v:mons[i+1].days?mons[i+1].t/mons[i+1].days:0}));
+    note='میانگین کالری روزانه در هر ماه شمسی سال '+fa(cur.y).replace(/٬/g,'');
+    $('chart').innerHTML=bars(items,g);
+  }
+  $('cn').textContent=note;
+}
+
+$('name').addEventListener('input',()=>{const f=S.foods[$('name').value.trim()];if(f){$('unit').value=f.unit;$('kc').value=f.kcal}});
+$('add').onclick=()=>{
+  const name=$('name').value.trim(),unit=$('unit').value.trim()||'عدد',kcal=num($('kc').value),qty=num($('qty').value);
+  if(!name||!(kcal>=0)||!(qty>0)){$('hint').textContent='نام غذا، کالری هر واحد و مقدار را درست وارد کنید.';return}
+  S.foods[name]={unit,kcal};
+  S.logs.push({id:Date.now()+Math.random(),date:$('day').value,meal:$('meal').value,name,unit,kcal,qty});
+  save();$('name').value='';$('kc').value='';$('qty').value=1;$('hint').textContent='ثبت شد.';render();
+};
+$('meals').onclick=e=>{const id=e.target.dataset.del;if(id){S.logs=S.logs.filter(l=>String(l.id)!==id);save();render()}};
+$('goal').onchange=()=>{S.goal=num($('goal').value)||0;save();render()};
+$('day').onchange=render;
+$('tabs').onclick=e=>{if(e.target.dataset.v){view=e.target.dataset.v;chart()}};
+$('exp').onclick=()=>{$('bk').value=JSON.stringify(S)};
+$('cp').onclick=async()=>{try{await navigator.clipboard.writeText($('bk').value);$('hint').textContent='کپی شد.'}catch(e){$('bk').select()}};
+$('imp').onclick=()=>{try{const o=JSON.parse($('bk').value);if(!o.logs||!o.foods)throw 0;S=Object.assign({foods:{},logs:[],goal:2000},o);save();render()}catch(e){alert('متن پشتیبان معتبر نیست.')}};
+const f1=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:1});
+let plan=0;
+function profile(){
+  const p=S.profile;if(!p)return;
+  [['sex','pg_sex'],['age','pg_age'],['w','pg_w'],['h','pg_h'],['d','pg_d'],['m','pg_m'],['i','pg_i'],['g','pg_g']].forEach(([k,id])=>{if(p[k]!==undefined)$(id).value=p[k]});
+}
+function calcPlan(){
+  const p={sex:$('pg_sex').value,age:num($('pg_age').value),w:num($('pg_w').value),h:num($('pg_h').value),d:num($('pg_d').value)||0,m:num($('pg_m').value)||0,i:num($('pg_i').value),g:num($('pg_g').value)};
+  const o=$('pg_out');
+  if(!(p.age>=15&&p.age<=100)||!(p.w>=25&&p.w<=300)||!(p.h>=120&&p.h<=230)||p.d<0||p.d>7||p.m<0){o.textContent='سن (۱۵ تا ۱۰۰)، وزن و قد را درست وارد کنید.';return}
+  S.profile=Object.assign({},p);
+  const hm=p.h/100,bmi=p.w/(hm*hm);
+  const cat=bmi<18.5?'کم‌وزن':bmi<25?'نرمال':bmi<30?'اضافه‌وزن':'چاقی';
+  const lo=18.5*hm*hm,hi=24.9*hm*hm;
+  const bmr=10*p.w+6.25*p.h-5*p.age+(p.sex==='m'?5:-161);
+  const exDay=(p.i-1)*p.w*(p.m/60)*p.d/7;
+  const tdee=bmr*1.2+exDay;
+  let t=tdee+p.g*(p.g<0?500:300);
+  const floor=p.sex==='m'?1500:1200;
+  let warn='';
+  if(t<floor){t=floor;warn='<div class="note">عدد محاسبه‌شده زیر حداقل ایمن بود و روی '+fa(floor)+' گذاشته شد.</div>'}
+  if(p.g<0&&bmi<18.5){t=tdee;warn='<div class="note">BMI شما پایین‌تر از محدوده نرمال است و کاهش وزن توصیه نمی‌شود. برنامه روی ثابت ماندن وزن تنظیم شد.</div>'}
+  if(p.age<18)warn+='<div class="note">برای زیر ۱۸ سال BMI و این فرمول‌ها دقیق نیستند. برنامه را با پزشک بررسی کنید.</div>';
+  t=Math.round(t/10)*10;plan=t;save();
+  const diff=t-tdee,wk=diff*7/7700;
+  o.innerHTML=`<div><b>BMI: ${f1(bmi)}</b> (${cat})</div>
+  <div class="note">وزن در محدوده نرمال برای قد شما: ${fa(lo)} تا ${fa(hi)} کیلوگرم</div>
+  <div style="margin-top:6px">متابولیسم پایه: ${fa(bmr)} — کالری مصرفی روزانه با فعالیت: ${fa(tdee)}</div>
+  <div>ورزش شما حدود ${fa(exDay)} کیلوکالری در روز (میانگین) می‌سوزاند.</div>
+  <div style="margin-top:6px"><b>برنامه پیشنهادی: ${fa(t)} کیلوکالری در روز</b>${Math.abs(wk)>=0.05?` (حدود ${f1(Math.abs(wk))} کیلوگرم ${wk<0?'کاهش':'افزایش'} در هفته)`:''}</div>
+  ${warn}
+  <button class="alt full" id="pg_set" style="margin-top:8px">استفاده به‌عنوان هدف روزانه</button>
+  <div class="note" style="margin-top:6px">این‌ها تخمین کلی هستند و جای مشاوره پزشک یا متخصص تغذیه را نمی‌گیرند.</div>`;
+  $('pg_set').onclick=()=>{S.goal=plan;save();render();$('pg_set').textContent='هدف روزانه روی '+fa(plan)+' تنظیم شد'};
+}
+$('pg_go').onclick=calcPlan;
+load();profile();$('day').value=iso(new Date());render();if(S.profile&&S.profile.age)calcPlan();
+</script>
+</body>
+</html>
